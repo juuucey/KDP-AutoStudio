@@ -1,6 +1,7 @@
 package com.kdp.autostudio.service;
 
 import com.kdp.autostudio.config.ConfigManager;
+import com.kdp.autostudio.dao.IIdeaDAO;
 import com.kdp.autostudio.dao.IdeaDAO;
 import com.kdp.autostudio.model.Idea;
 import com.google.gson.Gson;
@@ -19,16 +20,32 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Service for managing research jobs and processing results.
+ * Implements IResearchService interface for better testability and flexibility.
  */
-public class ResearchService {
+public class ResearchService implements IResearchService {
     private static final Logger logger = LoggerFactory.getLogger(ResearchService.class);
     private final ConfigManager configManager;
-    private final IdeaDAO ideaDAO;
+    private final IIdeaDAO ideaDAO;
     private final Gson gson;
 
+    /**
+     * Default constructor that uses SQLite implementation.
+     */
     public ResearchService() {
         this.configManager = ConfigManager.getInstance();
         this.ideaDAO = new IdeaDAO();
+        this.gson = new Gson();
+    }
+
+    /**
+     * Constructor that allows dependency injection of the DAO.
+     * Useful for testing with mock implementations.
+     *
+     * @param ideaDAO The data access object to use
+     */
+    public ResearchService(IIdeaDAO ideaDAO) {
+        this.configManager = ConfigManager.getInstance();
+        this.ideaDAO = ideaDAO;
         this.gson = new Gson();
     }
 

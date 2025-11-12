@@ -12,8 +12,9 @@ import java.util.List;
 
 /**
  * Data Access Object for Idea entities.
+ * SQLite implementation of the IIdeaDAO interface.
  */
-public class IdeaDAO {
+public class IdeaDAO implements IIdeaDAO {
     private static final Logger logger = LoggerFactory.getLogger(IdeaDAO.class);
 
     public void insert(Idea idea) throws SQLException {
