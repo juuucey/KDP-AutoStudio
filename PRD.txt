@@ -1,0 +1,197 @@
+🧩 Product Requirements Document
+KDP AutoStudio (Local Edition)
+AI-powered desktop research & design studio for Amazon KDP creators
+________________________________________
+1. Overview
+What is this app?
+KDP AutoStudio is a local desktop application that automates the entire Amazon KDP book creation pipeline — from market research and idea validation to interior and cover design — using AI reasoning (OpenAI) and AI design generation (Affinity AI).
+The app analyzes competitors, identifies profitable book ideas, scores them, and then helps you produce professional, KDP-ready books using integrated AI and Affinity’s design automation.
+________________________________________
+2. Objectives & Success Metrics
+Primary objectives
+1.	Automate 80% of the KDP book research and production workflow.
+2.	Produce KDP-compliant book files (cover, interior, metadata) with minimal manual input.
+3.	Shorten time from idea → publishable bundle to under 1 hour.
+4.	Improve book sales performance by targeting high-demand / low-competition niches.
+Success metrics
+•	≥60% reduction in research-to-production time.
+•	≥70% of AI-suggested ideas meet defined demand thresholds.
+•	0 preflight validation errors for produced files.
+•	25% higher first-month sales compared to manually created titles.
+________________________________________
+3. Target User
+Primary persona:
+Independent or small-team KDP publishers who produce low- or medium-content books (journals, planners, activity books, puzzle books, coloring books).
+They want to:
+•	Research profitable book niches quickly
+•	Generate high-quality interiors and covers
+•	Maintain creative control while reducing repetitive design tasks
+•	Keep all files local for privacy and speed
+________________________________________
+4. Key Features
+🧠 AI Research & Idea Generation (OpenAI + Local Webscraper)
+•	Local Python-based scraper collects Amazon KDP competitor data (titles, subtitles, price, BSR, categories, reviews, etc.).
+•	OpenAI API summarizes findings and produces:
+o	Market insights (“why it sells / why not”)
+o	Idea clustering & scoring (demand, competition, novelty)
+o	Suggested book angles and templates
+•	Generates a spreadsheet-style backlog of potential books stored locally in SQLite.
+📊 Idea Backlog & Scoring
+•	Each idea stored with key attributes:
+Keyword | Demand | Competition | Novelty | Risk | Profitability | Score
+•	Sort, filter, and approve ideas for production.
+•	AI explanations accompany each score for transparency.
+🎨 AI-Driven Design (Affinity AI + OpenAI)
+•	OpenAI API: Generates textual content — titles, subtitles, keywords, blurbs, descriptions, journaling prompts, puzzle instructions, etc.
+•	Affinity AI (local):
+o	AI Image generation for covers (backgrounds, motifs, textures)
+o	AI Inpainting & Vectorization for refinement
+o	AI Color Harmony & Typography suggestions
+o	Automatic spine and layout adjustments
+•	Integrated macros allow one-click creation of:
+o	Cover files (.afdesign, .pdf, .png)
+o	Interior layouts (.afpub, .pdf)
+•	Designer can fine-tune outputs within Affinity before export.
+🧾 Metadata & SEO Assistant
+•	OpenAI drafts metadata: title, subtitle, 7 KDP keywords, BISAC categories, description variations.
+•	Built-in compliance filter flags trademarked or risky keywords.
+🧰 Packaging & Validation
+•	Local pre-flight validation for:
+o	Trim size, bleed, page count, spine width, margins
+o	Font embedding, color space, DPI
+•	Exports KDP-ready .zip bundle containing:
+o	interior.pdf
+o	cover.pdf
+o	mockup.png
+o	metadata.json
+o	readme.txt
+📈 Analytics (Optional)
+•	Local script fetches daily BSR, reviews, and price changes for published ASINs.
+•	Dashboards display which niches and styles perform best.
+________________________________________
+5. Platform & Architecture
+Platform
+•	Type: Local desktop application
+•	Operating systems: Windows 11, macOS (latest)
+•	Offline support: Full functionality except for OpenAI API calls and scraping
+•	App framework: Java + JavaFX
+•	Database: SQLite (embedded)
+•	AI services:
+o	OpenAI API (cloud-based for reasoning, text generation)
+o	Affinity AI (local on-device for design automation)
+Architecture Diagram (conceptual)
+[Desktop UI - JavaFX]
+ ├── Research Panel (seed input, progress)
+ ├── Backlog View (sortable ideas)
+ ├── Production Wizard (interior, cover, metadata)
+ ├── Package Manager (export KDP bundles)
+ └── Analytics View (performance dashboards)
+
+[Local Services]
+ ├── Python Worker (webscraper, AI reasoning)
+ ├── Affinity AI Runner (macros & design automation)
+ ├── PDF Validator / Packager
+ └── SQLite Database (ideas, jobs, assets)
+
+[External Connections]
+ ├── OpenAI API (reasoning, text)
+ └── Internet access for competitor scraping (Amazon)
+________________________________________
+6. Workflow
+Step 1: Research & Scoring
+•	User enters seed keywords (e.g., “gratitude journal”, “kids handwriting workbook”).
+•	Scraper gathers top-selling listings (ASINs, ranks, pricing, reviews).
+•	OpenAI summarizes and scores niches; outputs structured backlog.
+•	Results are saved in local database and displayed in app.
+Step 2: Review Backlog
+•	Sort by score, seasonality, or risk.
+•	Inspect AI reasoning (“why it sells / why not”).
+•	Approve promising ideas for production.
+Step 3: Design with AI
+•	App passes approved ideas to Affinity AI:
+o	Generate and refine covers/interiors with macros.
+o	Import AI-generated content from OpenAI (titles, copy, prompts).
+o	Adjust automatically to KDP trim and spine requirements.
+Step 4: Validate & Package
+•	App runs preflight check (PDF size, bleed, fonts, DPI, spine width).
+•	Exports final files into /KDP_AutoStudio/Projects/{bookTitle}/bundle.zip.
+Step 5: Track Performance (optional)
+•	Input published ASINs; app fetches metrics and updates analytics.
+________________________________________
+7. Technology Stack
+Component	Technology
+UI / Main App	Java 21 + JavaFX
+Local DB	SQLite
+AI Reasoning	OpenAI API (via Python integration)
+Design AI	Affinity AI (Designer, Publisher, Photo)
+Scripting / Automation	Python 3.11 (Playwright for scraping, subprocess for macros)
+Packaging	Ghostscript + ImageMagick (preflight checks)
+File System	Local directories (/Projects, /Templates, /Assets)
+________________________________________
+8. Data Flow
+Stage	Input	Process	Output
+Research	Seed keywords	Python scraper + OpenAI reasoning	Ideas table (SQLite)
+Backlog Review	Idea selection	User filters and approves	Idea IDs → Production
+Design Generation	Approved ideas	OpenAI text + Affinity AI visuals	Interior & cover files
+Validation	PDF exports	Local preflight validator	Pass/Fail report
+Packaging	Validated assets	Bundler	ZIP bundle
+Analytics	ASINs	Amazon data fetch	Dashboard metrics
+________________________________________
+9. Scoring Model (unchanged)
+overall_score = 
+  0.35 * demand +
+  0.25 * (1 - competition) +
+  0.15 * margin +
+  0.15 * (1 - effort) +
+  0.10 * novelty
+Values normalized [0–1]. Adjustable weights stored in config file.
+________________________________________
+10. Non-Functional Requirements
+•	Performance: Research job ≤ 2 min per seed; book generation ≤ 5 min.
+•	Portability: Runs on both Windows and macOS without admin privileges.
+•	Privacy: All data, prompts, and generated content stored locally.
+•	Security: Encrypted local API key storage (OpenAI).
+•	Compliance: Obeys Amazon robots.txt; no trademarked or unsafe content.
+•	Resilience: Background tasks recover gracefully if internet drops mid-run.
+________________________________________
+11. Milestones
+Milestone	Duration	Deliverables
+M1 — Local Research Engine	Weeks 1–3	Python scraper, OpenAI reasoning, SQLite backlog, basic JavaFX UI
+M2 — Production & Design Integration	Weeks 4–6	Affinity AI macros, OpenAI metadata, local project export
+M3 — Validation & Packaging	Weeks 7–8	Preflight checks, KDP bundle generator, config manager
+M4 — Polish & Analytics	Weeks 9–10	Performance dashboard, local data visualization, bug fixes
+________________________________________
+12. AI Integrations
+OpenAI API
+•	Purpose: Market reasoning, content & metadata generation
+•	Models: GPT-4 or GPT-4-turbo
+•	Use Cases:
+o	Summarize niche competition
+o	Generate metadata and blurbs
+o	Generate text for interiors (journals, activity prompts)
+Affinity AI
+•	Purpose: Image and layout generation for covers/interiors
+•	Functions:
+o	AI Image generation (cover art)
+o	AI Fill/Inpaint (background and textures)
+o	AI Vectorize (line art & icons)
+o	AI Color Harmony & typography refinement
+•	Automation: Via Affinity macros triggered by the desktop app
+________________________________________
+13. Future Enhancements (post-MVP)
+•	Series builder (automatically generate sequels/variations)
+•	Multi-language metadata support
+•	Built-in KDP uploader integration
+•	Custom template builder for interiors
+•	Community template sharing
+________________________________________
+14. Summary
+Category	Decision
+App Type	Local desktop app
+Core AI Tools	OpenAI API (reasoning, text) + Affinity AI (visuals)
+Database	SQLite (local)
+Scraping	Local Python (Playwright)
+Export Format	KDP-ready ZIP bundle
+Primary User	Independent KDP publisher
+Goal	Automate research & production while maintaining creative control
+
